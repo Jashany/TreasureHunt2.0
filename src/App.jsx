@@ -28,14 +28,14 @@ const App = () => {
 
   // --- Geofence Configuration ---
   // FIXME: Replace with your target latitude/longitude for the geofence center
-  const targetLat = 30.356016; // Example: New York City Hall Latitude
-  const targetLon = 76.371482; // Example: New York City Hall Longitude
+  const targetLat = 30.353955; // Example: New York City Hall Latitude
+  const targetLon = 76.362377; // Example: New York City Hall Longitude
   const fenceRadius = 100; // meters - Adjust as needed
 
   // --- AR Object Configuration ---
   // FIXME: Replace with the exact GPS coordinates where the AR object should appear
-  const objectLat = 30.356016; // Example: Same as fence center
-  const objectLon = 76.371482; // Example: Same as fence center
+  const objectLat = 30.353955; // Example: Same as fence center
+  const objectLon = 76.362377; // Example: Same as fence center
 
   useEffect(() => {
     // Check if A-Frame and AR.js components are loaded
