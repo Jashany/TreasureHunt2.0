@@ -205,10 +205,10 @@ const App = () => {
         <a-camera gps-new-camera="gpsMinDistance: 1; gpsTimeInterval: 500"></a-camera>
 
         {/* show just a cube */}
-        <a-box
+        <a-entity
           id="target-object"
-          material="color: red"
-          scale="2 2 2"
+          gltf-model="url(./assets/robo.glb)"
+          scale="5 5 5"
           gps-new-entity-place={`latitude: ${objectLat}; longitude: ${objectLon}`}
           look-at="[gps-new-camera]"
         />
