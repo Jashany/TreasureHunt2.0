@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import model from './assets/Lorry.glb'
+import model from "./assets/Lorry.glb";
+
 // Haversine formula to calculate distance between two points on Earth
 function getDistance(lat1, lon1, lat2, lon2) {
   const R = 6371e3; // metres
@@ -25,21 +26,20 @@ const App = () => {
   const [arReady, setArReady] = useState(false);
   const [distanceToTarget, setDistanceToTarget] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+  const [answer, setAnswer] = useState(""); // State for user's answer
+  const [question, setQuestion] = useState(null); // State for current question
+  const [feedback, setFeedback] = useState(""); // State for feedback on answer
 
   // --- Geofence Configuration ---
-  // FIXME: Replace with your target latitude/longitude for the geofence center
   const targetLat = 30.353955; // Example: New York City Hall Latitude
   const targetLon = 76.362377; // Example: New York City Hall Longitude
   const fenceRadius = 100; // meters - Adjust as needed
 
   // --- AR Object Configuration ---
-  // FIXME: Replace with the exact GPS coordinates where the AR object should appear
   const objectLat = 30.353955; // Example: Same as fence center
   const objectLon = 76.362377; // Example: Same as fence center
 
   useEffect(() => {
-    // Check if A-Frame and AR.js components are loaded
-    // We need to wait for the scripts in index.html to load and register components
     const checkARComponents = setInterval(() => {
       if (
         window.AFRAME &&
@@ -52,7 +52,7 @@ const App = () => {
       } else {
         console.log("Waiting for AR components...");
       }
-    }, 500); // Check every 500ms
+    }, 500);
 
     let watchId;
 
@@ -61,7 +61,7 @@ const App = () => {
         (position) => {
           const { latitude, longitude, accuracy } = position.coords;
           setCurrentPosition({ latitude, longitude });
-          setError(null); // Clear previous errors
+          setError(null);
           console.log(
             `Current location: Lat ${latitude}, Lon ${longitude}, Accuracy: ${accuracy}m`
           );
@@ -72,13 +72,12 @@ const App = () => {
             targetLat,
             targetLon
           );
-          setDistanceToTarget(distance); // Update distance state
+          setDistanceToTarget(distance);
           console.log(`Distance to target: ${distance.toFixed(2)}m`);
           setIsWithinFence(distance <= fenceRadius);
         },
         (err) => {
           console.error("Error getting location:", err);
-          // Provide more specific error messages
           let message = `Error getting location: ${err.message} (Code: ${err.code})`;
           if (err.code === 1)
             message =
@@ -87,14 +86,14 @@ const App = () => {
             message = "Location position unavailable. Check GPS signal.";
           if (err.code === 3) message = "Location request timed out.";
           setError(message);
-          setIsWithinFence(false); // Assume outside fence on error
-          setDistanceToTarget(null); // Reset distance on error
+          setIsWithinFence(false);
+          setDistanceToTarget(null);
           setCurrentPosition(null);
         },
         {
-          enableHighAccuracy: true, // Request high accuracy
-          timeout: 15000, // Increased timeout (15 seconds)
-          maximumAge: 0, // Force fresh reading
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0,
         }
       );
     } else {
@@ -102,31 +101,26 @@ const App = () => {
       setIsWithinFence(false);
     }
 
-    // Cleanup function
     return () => {
       if (watchId) {
         navigator.geolocation.clearWatch(watchId);
       }
-      clearInterval(checkARComponents); // Clear the interval checker
+      clearInterval(checkARComponents);
     };
-  }, [targetLat, targetLon, fenceRadius]); // Re-run effect if fence changes
+  }, [targetLat, targetLon, fenceRadius]);
 
-  // Effect for adding click listener to AR entity
   useEffect(() => {
     let entity = null;
     let clickHandler = null;
 
-    // Only try to add listener if AR is ready and user is inside the fence
     if (arReady && isWithinFence) {
-      // Use a small timeout to allow A-Frame to potentially render the entity
       const timeoutId = setTimeout(() => {
-        entity = document.querySelector("#target-object"); // Select entity by ID
+        entity = document.querySelector("#target-object");
         if (entity) {
           clickHandler = () => {
             console.log("Entity clicked!");
-            setIsModalOpen(true); // Open the modal on click
+            setIsModalOpen(true);
           };
-          // Use 'click' event which is triggered by the cursor component
           entity.addEventListener("click", clickHandler);
           console.log("Click listener added to #target-object.");
         } else {
@@ -134,9 +128,8 @@ const App = () => {
             "Could not find #target-object to attach listener after timeout."
           );
         }
-      }, 500); // Wait 500ms
+      }, 500);
 
-      // Cleanup function for this effect
       return () => {
         clearTimeout(timeoutId);
         if (entity && clickHandler) {
@@ -145,12 +138,58 @@ const App = () => {
         }
       };
     }
-    // If not ready or not within fence, the effect doesn't run,
-    // or the cleanup from the previous run (if any) handles removal.
     return undefined;
-  }, [arReady, isWithinFence]); // Re-run when AR readiness or fence status changes
+  }, [arReady, isWithinFence]);
 
-  // --- A-Frame Scene ---
+  useEffect(() => {
+    const fetchInitialQuestion = async () => {
+      setQuestion({
+        _id: "mock123",
+        text: "What is the capital of France?",
+        geolocation: { coordinates: [targetLon, targetLat] },
+      });
+    };
+
+    fetchInitialQuestion();
+  }, []);
+
+  const handleAnswerSubmit = async (e) => {
+    e.preventDefault();
+    setFeedback("Checking answer...");
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const correctAnswer = "Paris";
+    const data = {
+      success: answer.trim().toLowerCase() === correctAnswer.toLowerCase(),
+      message:
+        answer.trim().toLowerCase() === correctAnswer.toLowerCase()
+          ? "Correct!"
+          : "Incorrect answer. Try again.",
+      nextQuestionData:
+        answer.trim().toLowerCase() === correctAnswer.toLowerCase()
+          ? {
+              _id: "mock456",
+              text: "Next question...",
+              geolocation: {
+                coordinates: [targetLon + 0.001, targetLat + 0.001],
+              },
+            }
+          : null,
+      isHuntCompleted: false,
+    };
+
+    setFeedback(data.message);
+    if (data.success) {
+      setIsModalOpen(false);
+      setAnswer("");
+      if (data.nextQuestionData) {
+        setQuestion(data.nextQuestionData);
+      } else if (data.isHuntCompleted) {
+        setQuestion(null);
+        setFeedback("Congratulations! You completed the hunt!");
+      }
+    }
+  };
+
   const renderARScene = () => {
     if (!arReady) {
       return <div>Loading AR components...</div>;
@@ -161,39 +200,20 @@ const App = () => {
         vr-mode-ui="enabled: false"
         arjs="sourceType: webcam; videoTexture: true; debugUIEnabled: true;"
         renderer="logarithmicDepthBuffer: true;"
-        // Add cursor component for interaction detection
         cursor="rayOrigin: mouse; fuse: false;"
       >
-        {/* Add raycaster to camera for cursor interaction */}
-        <a-camera gps-new-camera="gpsMinDistance: 1; gpsTimeInterval: 500">
-          {/* Optional: Add a visual indicator for the cursor */}
-          {/* <a-entity cursor="fuse: false;" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: white; shader: flat"></a-entity> */}
-        </a-camera>
-
-        {/* --- Your AR Object --- */}
-        {/* <a-entity
-          id="target-object" // Add ID for selection
-          material="color: dodgerblue"
-          geometry="primitive: box"
-          scale="0.8 0.8 0.8"
-          gps-new-entity-place={`latitude: ${objectLat}; longitude: ${objectLon}`}
-          look-at="[gps-new-camera]"
-        /> */}
-
-        {/* Example: Load a GLTF model */}
-        
+        <a-camera gps-new-camera="gpsMinDistance: 1; gpsTimeInterval: 500"></a-camera>
         <a-entity
-          gltf-model="url(./assets/Lorry.glb)" // Replace with your model path (place in public folder)
-          scale="5 5 5" // Adjust scale
+          id="target-object"
+          gltf-model="url(./assets/Lorry.glb)"
+          scale="5 5 5"
           gps-new-entity-place={`latitude: ${objectLat}; longitude: ${objectLon}`}
           look-at="[gps-new-camera]"
         />
-       
       </a-scene>
     );
   };
 
-  // --- Basic Modal Styles --- (Consider moving to App.css)
   const modalOverlayStyle = {
     position: "fixed",
     top: 0,
@@ -204,7 +224,7 @@ const App = () => {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 1000, // Ensure it's above the A-Frame scene
+    zIndex: 1000,
   };
 
   const modalContentStyle = {
@@ -216,69 +236,126 @@ const App = () => {
   };
 
   return (
-    <div className="App">
-      <h1>Geofenced Web AR</h1>
+    <div
+      className="App"
+      style={{ display: "flex", flexDirection: "column", height: "100vh" }}
+    >
+      <h1>Geofenced Web AR Treasure Hunt</h1>
       <p>Status: {arReady ? "AR Ready" : "Initializing AR..."}</p>
       {error && <p style={{ color: "red", fontWeight: "bold" }}>{error}</p>}
 
-      {currentPosition ? (
-        <div>
-          <p>
-            Your Location: Lat: {currentPosition.latitude.toFixed(6)}, Lon:{" "}
-            {currentPosition.longitude.toFixed(6)}
-          </p>
-          <p>
-            Target Area Center: Lat: {targetLat.toFixed(6)}, Lon:{" "}
-            {targetLon.toFixed(6)} (Radius: {fenceRadius}m)
-          </p>
-          {/* Display the distance */}
-          {distanceToTarget !== null && (
-            <p>Distance to Target: {distanceToTarget.toFixed(2)}m</p>
-          )}
-          <p style={{ fontWeight: "bold" }}>
-            Geofence Status:{" "}
-            {isWithinFence ? "Inside Target Area" : "Outside Target Area"}
-          </p>
-        </div>
-      ) : (
-        !error && <p>Attempting to get your location...</p>
-      )}
-
-      {/* AR Scene Container */}
-      {arReady && isWithinFence ? (
+      <div style={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
         <div
           style={{
-            margin: "20px 0",
-            width: "100%",
-            height: "70vh",
-            position: "relative", // Needed for potential absolute positioning inside
+            width: "80%",
+            height: "100%",
+            position: "relative",
             border: "1px solid black",
+            overflow: "hidden",
           }}
         >
-          {renderARScene()}
+          {arReady && isWithinFence ? (
+            renderARScene()
+          ) : isWithinFence && !arReady ? (
+            <p>Loading AR View...</p>
+          ) : !isWithinFence && currentPosition ? (
+            <p style={{ padding: "20px" }}>
+              Move into the designated area (within {fenceRadius}m of the
+              target) to see the AR object.
+            </p>
+          ) : null}
         </div>
-      ) : isWithinFence && !arReady ? (
-        <p>Loading AR View...</p>
-      ) : null}
-      {!isWithinFence && currentPosition && (
-        <p>
-          Move into the designated area (within {fenceRadius}m of the target) to
-          see the AR object.
-        </p>
-      )}
 
-      {/* Modal */}
-      {isModalOpen && (
+        <div
+          style={{
+            width: "20%",
+            padding: "15px",
+            borderLeft: "1px solid #ccc",
+            overflowY: "auto",
+          }}
+        >
+          <h2>Information</h2>
+          {currentPosition ? (
+            <div>
+              <p>
+                <strong>Your Location:</strong>
+                <br />
+                Lat: {currentPosition.latitude.toFixed(6)}
+                <br />
+                Lon: {currentPosition.longitude.toFixed(6)}
+              </p>
+              <p>
+                <strong>Target Area Center:</strong>
+                <br />
+                Lat: {targetLat.toFixed(6)}
+                <br />
+                Lon: {targetLon.toFixed(6)}
+                <br />
+                (Radius: {fenceRadius}m)
+              </p>
+              {distanceToTarget !== null && (
+                <p>
+                  <strong>Distance to Target:</strong>{" "}
+                  {distanceToTarget.toFixed(2)}m
+                </p>
+              )}
+              <p style={{ fontWeight: "bold" }}>
+                Geofence Status:{" "}
+                {isWithinFence ? "Inside Target Area" : "Outside Target Area"}
+              </p>
+            </div>
+          ) : (
+            !error && <p>Attempting to get your location...</p>
+          )}
+          {!isWithinFence && currentPosition && (
+            <p style={{ color: "orange", marginTop: "10px" }}>
+              You need to be inside the target area to interact.
+            </p>
+          )}
+        </div>
+      </div>
+
+      {isModalOpen && isWithinFence && question && (
         <div style={modalOverlayStyle} onClick={() => setIsModalOpen(false)}>
-          {/* Close on overlay click */}
           <div style={modalContentStyle} onClick={(e) => e.stopPropagation()}>
-            <h2>Object Interaction</h2>
-            <p>You clicked the AR object!</p>
+            <h2>Question Time!</h2>
+            <p>{question.text}</p>
+            <form onSubmit={handleAnswerSubmit}>
+              <input
+                type="text"
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                placeholder="Your answer"
+                required
+                style={{
+                  padding: "8px",
+                  marginRight: "10px",
+                  minWidth: "200px",
+                }}
+              />
+              <button type="submit" style={{ padding: "8px 15px" }}>
+                Submit
+              </button>
+            </form>
+            {feedback && (
+              <p
+                style={{
+                  marginTop: "10px",
+                  color: feedback.startsWith("Correct") ? "green" : "red",
+                }}
+              >
+                {feedback}
+              </p>
+            )}
             <button
               onClick={() => setIsModalOpen(false)}
-              style={{ marginTop: "15px", padding: "8px 15px" }}
+              style={{
+                marginTop: "15px",
+                padding: "8px 15px",
+                background: "lightgrey",
+              }}
             >
-              Close
+              Close Question
             </button>
           </div>
         </div>
