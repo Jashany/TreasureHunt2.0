@@ -203,13 +203,23 @@ const App = () => {
         cursor="rayOrigin: mouse; fuse: false;"
       >
         <a-camera gps-new-camera="gpsMinDistance: 1; gpsTimeInterval: 500"></a-camera>
-        <a-entity
+
+        {/* show just a cube */}
+        <a-box
+          id="target-object"
+          material="color: red"
+          scale="2 2 2"
+          gps-new-entity-place={`latitude: ${objectLat}; longitude: ${objectLon}`}
+          look-at="[gps-new-camera]"
+        />
+      
+        {/* <a-entity
           id="target-object"
           gltf-model="url(./assets/Lorry.glb)"
           scale="5 5 5"
           gps-new-entity-place={`latitude: ${objectLat}; longitude: ${objectLon}`}
           look-at="[gps-new-camera]"
-        />
+        /> */}
       </a-scene>
     );
   };
