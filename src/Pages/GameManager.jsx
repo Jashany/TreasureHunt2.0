@@ -7,8 +7,8 @@ import NavigatingState from "./States/NavigatingState";
 import "./GameManager.css";
 
 const RADAR_MAX_RANGE_M = 120;
-const PROMPT_CAMERA_THRESHOLD_M = 80;
-const AR_VIEW_THRESHOLD_M = 65;
+const PROMPT_CAMERA_THRESHOLD_M = 50;
+const AR_VIEW_THRESHOLD_M = 20;
 
 const GameManager2 = () => {
   const [currentClue, setCurrentClue] = useState(null);

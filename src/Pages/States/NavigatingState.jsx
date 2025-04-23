@@ -15,6 +15,7 @@ const NavigatingState = ({ clue, userLocation, distance, isCameraPrompt,showAR,o
         justifyContent: "center",
         padding: "2rem",
         marginTop: "2rem",
+        height:"fit-content",
         width: "100%", // Ensure NavigatingState takes full width if needed for percentage widths below
       }}
     >

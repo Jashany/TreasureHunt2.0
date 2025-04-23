@@ -9,6 +9,7 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [teamName, setTeamName] = useState(""); // New state for team name
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ const Signup = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ name, email, password, phoneNumber }),
+          body: JSON.stringify({ name, email, password, phoneNumber,teamName }),
         }
       );
 
@@ -115,6 +116,20 @@ const Signup = () => {
             required
           />
         </div>
+        <div className={styles.inputGroup}>
+          <label htmlFor="teamName" className={styles.label}>
+            Team Name:
+          </label>
+          <input
+            type="text"
+            id="teamName"
+            className={styles.input}
+            value={teamName}
+            onChange={(e) => setTeamName(e.target.value)}
+            required
+            />
+
+          </div>
 
         <div className={styles.inputGroup}>
           <label htmlFor="phoneNumber" className={styles.label}>

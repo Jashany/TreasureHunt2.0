@@ -1,7 +1,8 @@
 /* src/GameManager.css */
 .game-container {
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
+    height: fit-content;
     overflow: hidden;
     position: relative;
     background-color: #282c34; /* Default background */

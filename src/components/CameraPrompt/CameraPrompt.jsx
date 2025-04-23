@@ -1,13 +1,12 @@
 import React, { useState, useRef, useEffect, Suspense } from "react"; // Import Suspense
 import { Canvas, useFrame } from "@react-three/fiber";
-// Import useGLTF and remove OrbitControls if not used
-import { useGLTF } from "@react-three/drei";
+// Import useGLTF, useAnimations and remove OrbitControls if not used
+import { useGLTF, useAnimations } from "@react-three/drei";
 import * as THREE from "three";
 import styles from "./CameraPrompt.module.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-// Keep the model import
-import model from "../../assets/robo.glb";
+// Keep the model import - REMOVE the old one if no longer needed
 
 // Simple Popup Component (Remains the same)
 const QuestionPopup = ({ question, isLoading, error, onSubmit, onClose }) => {
@@ -49,6 +48,15 @@ const QuestionPopup = ({ question, isLoading, error, onSubmit, onClose }) => {
             >
               {question?.currentQuestion?.question}
             </p>
+            <p>
+              Link :{" "}
+              <a
+                href={question?.currentQuestion?.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "blue", textDecoration: "underline" }}
+              >Click Here</a>
+            </p>
             <input
               type="text"
               value={answer}
@@ -72,34 +80,46 @@ const QuestionPopup = ({ question, isLoading, error, onSubmit, onClose }) => {
   );
 };
 
-// Component to load and display the GLB model
-const RoboModel = ({ onClick }) => {
-  // Use the imported model variable which Vite should resolve to the correct URL
-  const { scene } = useGLTF(model); // Use the imported variable
-  const modelRef = useRef();
+// Component to load and display the GLTF model with animation
+const MagnemiteModel = ({ onClick }) => {
+  const group = useRef();
+  // Use the imported magnemite model variable
+  const { scene, animations } = useGLTF('/src/assets/magnemite/scene.gltf');
+  const { actions } = useAnimations(animations, group); // Use useAnimations hook
 
-  // Apply rotation animation
-  useFrame((state, delta) => {
-    if (modelRef.current) {
-      modelRef.current.rotation.y += delta * 0.5; // Rotate around Y axis
+
+  // Play the animation
+  useEffect(() => {
+    // Log available animation names
+    console.log("Available animations:", Object.keys(actions));
+    // Play the first animation found (adjust name if needed, e.g., actions['Take 001'])
+    const animationName = Object.keys(actions)[0];
+    if (animationName) {
+      actions[animationName]?.play();
     }
-  });
-
-  // Clone the scene to allow modifications like onClick
-  const clonedScene = scene.clone();
+    // Cleanup function to stop animation on unmount
+    return () => {
+      if (animationName) {
+        actions[animationName]?.stop();
+      }
+    };
+  }, [actions]);
 
   return (
-    <primitive
-      ref={modelRef}
-      object={clonedScene} // Use the cloned scene
-      onClick={(event) => {
-        console.log("Model clicked!"); // Debug log
-        event.stopPropagation(); // Prevent potential event bubbling issues
-        onClick(); // Call the passed handler
-      }}
-      position={[0, -1, -10]} // Adjust position as needed
-      scale={1.5} // Adjust scale as needed
-    />
+    // Use a group to apply transformations and attach the ref for animations
+    <group ref={group} dispose={null}>
+      <primitive
+        object={scene} // Use the original scene directly
+        onClick={(event) => {
+          console.log("Magnemite Model clicked!"); // Debug log
+          event.stopPropagation(); // Prevent potential event bubbling issues
+          onClick(); // Call the passed handler
+        }}
+        // Adjust position and scale for Magnemite
+        position={[0, -1, -5]} // Brought closer on Z-axis
+        scale={0.5} // Adjust scale if needed
+      />
+    </group>
   );
 };
 
@@ -118,6 +138,7 @@ const CameraPrompt = ({ showAr, onCorrectAnswer }) => {
   const [fetchError, setFetchError] = useState(null);
 
   const openCamera = async () => {
+    console.log("Opening camera...");
     setError("");
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -308,10 +329,11 @@ const CameraPrompt = ({ showAr, onCorrectAnswer }) => {
                   zIndex: 1,
                 }}
               >
-                <ambientLight intensity={0.8} />
-                <directionalLight position={[5, 5, 5]} intensity={1} />
+                <ambientLight intensity={1.0} /> {/* Increased intensity slightly */}
+                <directionalLight position={[5, 10, 7.5]} intensity={1.5} /> {/* Increased intensity */}
                 <Suspense fallback={null}>
-                  <RoboModel onClick={handleModelClick} />
+                  {/* Use the new MagnemiteModel component */}
+                  <MagnemiteModel onClick={handleModelClick} />
                 </Suspense>
               </Canvas>
             </div>
