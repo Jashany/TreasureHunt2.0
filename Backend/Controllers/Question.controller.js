@@ -189,7 +189,7 @@ const getCurrentState = asyncHandler(async (req, res) => {
     // Fetch user and populate the currentQuestion field in one go
     const user = await UserModel.findById(userId).populate({
         path: 'currentQuestion',
-        select: 'question geolocation title _id' // Select only needed fields from Question
+        select: 'question geolocation title _id hint' // Select only needed fields from Question
     });
 
     if (!user) {
@@ -221,7 +221,7 @@ const getCurrentState = asyncHandler(async (req, res) => {
 // controllers/question.controller.jsmodels are exported from index.js
 
 // --- Helper Function (Optional but Recommended) ---
-const findPreviousQuestion = async (sequenceNumber) => {
+const  findPreviousQuestion = async (sequenceNumber) => {
     if (sequenceNumber <= 1) {
         return null; // No previous question for sequence 1
     }
@@ -242,7 +242,9 @@ const createQuestion = asyncHandler(async (req, res) => {
         answer,
         longitude, // Expecting longitude and latitude separately for ease of use
         latitude,
-        sequenceNumber
+        link,
+        sequenceNumber,
+        hint
     } = req.body;
 
     // Basic Validation
@@ -279,6 +281,8 @@ const createQuestion = asyncHandler(async (req, res) => {
         sequenceNumber: parseInt(sequenceNumber),
         // New question initially points to whatever the previous question *used* to point to
         nextQuestion: prevQuestion ? prevQuestion.nextQuestion : null,
+        link, // Optional: Add link if provided
+        hint, // Optional: Add hint if provided
     });
 
     const createdQuestion = await newQuestion.save();
@@ -437,6 +441,185 @@ const deleteQuestion = asyncHandler(async (req, res) => {
 });
 
 
+const getCurrentSequenceQuestion = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user.id; // Assuming auth middleware adds user object to req
+
+    const user = await UserModel.findById(userId);
+
+    if (!user) {
+        res.status(404);
+        throw new Error('User not found');
+    }
+
+    const sequenceNumber = user.currentSequenceNumber;
+
+    if(user.isHuntCompleted){
+        return res.status(200).json({ 
+            success: true, 
+            message: 'You have already completed the hunt!' ,
+            isHuntCompleted: user.isHuntCompleted
+        });
+    }
+    const currentQuestion = await QuestionModel.findOne({ sequenceNumber });
+
+    if (!currentQuestion) {
+        res.status(404);
+        throw new Error('Current question not found');
+    }
+
+    res.status(200).json({
+        message: 'Current question retrieved successfully',
+        currentQuestion: {
+            _id: currentQuestion._id,
+            question: currentQuestion.question,
+            geolocation: currentQuestion.geolocation,
+            title: currentQuestion.title, // Optional
+            hint: currentQuestion.hint, // Optional
+        },
+        isHuntCompleted: user.isHuntCompleted,
+    });
+  } catch (error) {
+    console.error('Error fetching current sequence question:', error);
+    res.status(500).json({ message: 'Internal server error' });
+    
+  }
+}
+);
+
+const checkAnswerCurrent = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user.id; // Assuming auth middleware adds user object to req
+    const { userAnswer } = req.body;
+   
+
+    const user = await UserModel.findById(userId);
+
+    if (!user) {
+        res.status(404);
+        throw new Error('User not found');
+    }
+
+    if (user.isHuntCompleted) {
+        return res.status(400).json({ success: false, message: 'You have already completed the hunt!' });
+    }
+
+    if (!user.currentQuestion) {
+        res.status(400);
+        throw new Error('Hunt not started or current question unknown. Please start the hunt first.');
+    }
+    // Fetch the details of the user's current question
+
+    const question = await QuestionModel.findById(user.currentQuestion);
+    if (!question) {
+        // Data integrity issue, the user's current question doesn't exist
+        return res.status(404).json({ success: false, message: 'Current question data not found. Please try starting the hunt again.' });
+    }
+
+    
+    // --- Compare the submitted answer with the correct answer ---
+    const correctAnswer = question.answer;
+
+    const isCorrect = userAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
+
+    if (isCorrect) {
+        // --- Answer is Correct ---
+
+        // Add the just-completed question to the user's done list
+        user.questionsDone.push({ question: user.currentQuestion });
+
+        // Determine the next question ID
+        const nextQuestionId = question.nextQuestion; // This can be null
+
+        let nextQuestionData = null;
+        if (nextQuestionId) {
+            // Fetch the details of the *next* question to send back
+            const nextQuestionDoc = await QuestionModel.findById(nextQuestionId);
+            if (nextQuestionDoc) {
+                 nextQuestionData = {
+                    _id: nextQuestionDoc._id,
+                    question: nextQuestionDoc.question,
+                    geolocation: nextQuestionDoc.geolocation,
+                    title: nextQuestionDoc.title, // Optional
+                    hint: nextQuestionDoc.hint, // Optional
+                };
+                user.currentSequenceNumber = nextQuestionDoc.sequenceNumber; // Update user's current question
+                user.currentQuestion = nextQuestionId; // Update user's current question
+            } else {
+                // Data integrity issue: nextQuestion points to non-existent question
+                console.error(`Data Integrity Error: Question ${question._id} nextQuestion points to non-existent ID ${nextQuestionId}`);
+                user.currentQuestion = null; // Halt progress
+                user.isHuntCompleted = true; // Or handle as an error state
+                // Decide how to handle this - maybe mark hunt as "stuck" or complete prematurely?
+                // For now, we'll treat it like the end of the hunt.
+            }
+        } else {
+            // This was the last question
+            user.currentQuestion = null;
+            user.isHuntCompleted = true;
+        }
+
+        // Save the updated user state
+        await user.save();
+
+        // Send success response
+        res.status(200).json({
+            success: true,
+            message: 'Correct!',
+            isHuntCompleted: user.isHuntCompleted,
+            nextQuestionData: nextQuestionData // This will be null if the hunt is completed
+        });
+
+    }else{
+        // --- Answer is Incorrect ---
+        res.status(400).json({ // Use 400 Bad Request to indicate incorrect input/answer
+            success: false,
+            message: 'Incorrect answer. Please try again.',
+        });
+    }
+}catch (error) {
+    console.error('Error checking answer:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+const addNextQuestion = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { nextQuestionId } = req.body; // Expecting the ID of the next question
+
+    if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(nextQuestionId)) {
+        res.status(400);
+        throw new Error('Invalid question ID format');
+    }
+
+    const question = await QuestionModel.findById(id);
+    const nextQuestion = await QuestionModel.findById(nextQuestionId);
+
+    if (!question || !nextQuestion) {
+        res.status(404);
+        throw new Error('Question or next question not found');
+    }
+
+    // Update the nextQuestion field of the current question
+    question.nextQuestion = nextQuestionId;
+    await question.save();
+
+    return res.status(200).json({
+        message: `Next question for ${question._id} updated successfully.`,
+        question: {
+            _id: question._id,
+            question: question.question,
+            geolocation: question.geolocation,
+            title: question.title, // Optional
+            hint: question.hint, // Optional
+        },
+    });
+
+});
+
+
+
 
 // Export the controller functions
 export {
@@ -449,4 +632,7 @@ export {
     getQuestionById,
     updateQuestion,
     deleteQuestion,
+    getCurrentSequenceQuestion,
+    checkAnswerCurrent,
+    addNextQuestion
 };

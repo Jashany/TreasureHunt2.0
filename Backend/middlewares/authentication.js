@@ -62,6 +62,7 @@ const roleAuthorization = (roles) => { // roles should be an array, e.g., ['admi
         }
 
         if (roles.includes(req.user.role)) {
+            console.log("User role:", req.user.role); // Debugging line to check user role
             next(); // User has one of the required roles
         } else {
             res.status(403).json({ // 403 Forbidden - authenticated but not authorized

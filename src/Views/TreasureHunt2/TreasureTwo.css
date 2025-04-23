@@ -1,0 +1,59 @@
+
+  .App {
+    text-align: center;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden; /* Prevent scrolling */
+    position: relative; /* For positioning overlays */
+  }
+  
+  .status-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      z-index: 50;
+      padding: 20px;
+      box-sizing: border-box;
+      font-size: 1.1rem;
+      line-height: 1.6;
+  }
+  
+  .status-overlay.error {
+      background-color: rgba(100, 0, 0, 0.85);
+      color: #ffdddd;
+  }
+  .error-inline {
+      color: #ff8a8a;
+      font-size: 0.9em;
+      margin-top: 10px;
+  }
+  
+  .status-overlay.info {
+      background-color: rgba(0, 0, 30, 0.85);
+      color: #e0e0ff;
+  }
+  
+  /* Debug status bar - useful during development */
+  .debug-status {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: #ccc;
+      font-size: 0.7rem;
+      padding: 3px 5px;
+      z-index: 1001; /* Above everything */
+      text-align: left;
+      box-sizing: border-box;
+      pointer-events: none; /* Don't interfere with clicks */
+      white-space: pre-wrap; /* Allow wrapping */
+  }

@@ -1,0 +1,15 @@
+.game-manager-container{
+    background-image: url('../assets/background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 0rem;
+    overflow:hidden;
+    justify-content: flex-start;
+    font-family: "Antonio", sans-serif;
+    color: #fff;
+}

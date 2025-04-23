@@ -1,0 +1,136 @@
+/* src/components/Radar.module.css */
+.radarContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    margin-top: 100px;
+    font-family: "Antonio", sans-serif;
+    color: #fff;
+}
+
+
+.radarDisplay {
+    position: relative;
+    border: 2px solid #ffffff; /* Outer radar border */
+    border-radius: 50%;
+    background-color: #ffffff36; /* Dark green background */
+    overflow: hidden; /* Keep dots inside */
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    /* Add ::after for the sweep */
+}
+
+/* Add the sweep animation element */
+.radarDisplay::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0; /* Start from the left edge */
+    width: 50%; /* Half the width for the sweep line */
+    height: 100%;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 80%, rgba(255, 255, 255, 0.3) 100%); /* Fading white line */
+    transform-origin: right center; /* Rotate around the center-right point */
+    animation: radar-sweep 3s linear infinite;
+    border-radius: 150px 0 0 150px; /* Match parent radius on the left */
+    z-index: 1; /* Below dots but above background */
+}
+
+/* Concentric rings */
+.ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px dashed rgb(255, 255, 255); /* Dashed green lines */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.ringOuter {
+    width: 95%; /* Slightly inside the border */
+    height: 95%;
+}
+
+.ringMiddle {
+    width: 66%; /* Represents ~66m */
+    height: 66%;
+}
+.ringInner {
+    width: 33%; /* Represents ~33m */
+    height: 33%;
+}
+
+
+.userDot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    background-color: #ffffff; /* Bright user dot */
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    box-shadow: 0 0 5px #fff;
+}
+
+.treasureDot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%); /* Center the dot on its coords */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    z-index: 5;
+}
+
+/* Status styles */
+.far { /* > 50m to 100m */
+    background-color: rgba(144, 238, 144, 0.6); /* Lighter green, semi-transparent */
+    box-shadow: 0 0 4px rgba(144, 238, 144, 0.4);
+}
+
+.near { /* > 20m to 50m */
+    background-color: rgba(60, 179, 113, 0.9); /* Medium sea green, less transparent */
+     box-shadow: 0 0 6px rgba(60, 179, 113, 0.7);
+     width: 12px; /* Slightly larger */
+     height: 12px;
+}
+
+.prompt { /* <= 20m */
+    background-color: #ff6347; /* Tomato red - stands out */
+    box-shadow: 0 0 10px #ff6347, 0 0 15px #ff4500 inset; /* Glowing effect */
+    width: 14px; /* Even larger */
+    height: 14px;
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.7;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Add the keyframes for the sweep */
+@keyframes radar-sweep {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.statusText {
+    margin-top: 15px;
+    color: #ccc;
+    font-size: 0.9rem;
+}

@@ -1,0 +1,70 @@
+/* src/GameManager.css */
+.game-container {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+    background-color: #282c34; /* Default background */
+    color: white;
+  }
+  
+  /* General overlay for messages like Game Over */
+  .game-over-screen {
+      position: fixed;
+      inset: 0; /* Short for top, left, right, bottom = 0 */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.85);
+      color: #4CAF50; /* Green */
+      z-index: 200;
+      text-align: center;
+  }
+  .game-over-screen h2 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+  }
+  .game-over-screen p {
+      font-size: 1.2rem;
+      color: white;
+  }
+  
+  /* Simplified Loading/Error Components (Assume basic CSS) */
+  .loading-indicator, .error-display {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      z-index: 500;
+      font-size: 1.2rem;
+      padding: 20px;
+      text-align: center;
+  }
+  .error-display {
+      background-color: rgba(100, 0, 0, 0.8);
+      color: #ffdddd;
+  }
+  
+  
+  /* Debug Info Bar */
+  .debug-info {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: #aaa;
+      font-size: 0.7rem;
+      padding: 2px 5px;
+      z-index: 1001;
+      text-align: left;
+      pointer-events: none;
+      white-space: nowrap;
+      overflow-x: auto; /* Allow scrolling if too long */
+  }
+  
+  /* Reuse styles for ProximityPrompt, ARView, QuestionPopover from previous examples */

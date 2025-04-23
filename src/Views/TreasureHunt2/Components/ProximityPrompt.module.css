@@ -1,0 +1,49 @@
+/* src/components/ProximityPrompt.module.css */
+.promptOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    color: white;
+    text-align: center;
+}
+
+.promptBox {
+    background-color: rgba(40, 40, 40, 0.9);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+    max-width: 90%;
+    width: 350px;
+}
+
+.promptBox h2 {
+    color: #4CAF50; /* Green */
+    margin-bottom: 15px;
+}
+
+.promptBox p {
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.cameraButton {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.cameraButton:hover {
+    background-color: #45a049;
+}

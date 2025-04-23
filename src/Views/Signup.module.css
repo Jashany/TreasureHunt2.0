@@ -1,0 +1,15 @@
+/* filepath: c:\Users\jasha\Downloads\sem6\TreasureHunt\src\Views\Signup.module.css */
+/* Reusing Login styles for consistency - you can customize further */
+@import url("./Login.module.css");
+
+/* Add any Signup-specific overrides or additional styles here */
+/* Example: Different button color */
+/*
+.button {
+  background-color: #28a745; 
+}
+
+.button:not(:disabled):hover {
+  background-color: #218838;
+}
+*/

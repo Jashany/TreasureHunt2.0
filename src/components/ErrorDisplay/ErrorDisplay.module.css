@@ -1,0 +1,58 @@
+/* Using the same full-screen overlay style as suggested in GameManager.css */
+.errorOverlay {
+    position: fixed;
+    inset: 0; /* Short for top, left, right, bottom = 0 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(100, 0, 0, 0.85); /* Dark red semi-transparent background */
+    color: #ffdddd; /* Light red text color */
+    z-index: 500; /* Ensure it's above most content but potentially below modals if needed */
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.errorBox {
+    background-color: rgba(40, 0, 0, 0.9); /* Even darker box background */
+    padding: 25px 30px;
+    border-radius: 8px;
+    border: 1px solid #ffaaaa;
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+    max-width: 90%;
+    width: 400px;
+}
+
+.errorTitle {
+    color: #ff8a8a; /* Brighter red for title */
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border-bottom: 1px solid #ff8a8a;
+    padding-bottom: 10px;
+}
+
+.errorMessage {
+    margin-bottom: 0; /* Remove bottom margin if no button */
+    font-size: 1rem;
+    line-height: 1.5;
+    white-space: pre-wrap; /* Preserve line breaks in the error message */
+}
+
+/* Optional Dismiss Button Styles */
+.dismissButton {
+    margin-top: 20px;
+    padding: 8px 16px;
+    background-color: #ff8a8a;
+    color: #330000;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.dismissButton:hover {
+    background-color: #ffaaaa;
+}

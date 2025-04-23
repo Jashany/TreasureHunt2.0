@@ -1,0 +1,153 @@
+.radarContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  justify-content: center;
+  align-items: center;
+  padding: 20px; /* Add some padding if needed */
+}
+
+.radarDisplay {
+  position: relative; /* Needed for absolute positioning of children */
+  border-radius: 50%;
+  /* background-color: rgba(0, 200, 0, 0.1); /* Moved to background */
+  /* border: 2px solid green; /* Moved to background */
+  overflow: hidden;
+  /* box-shadow: 0 0 10px rgba(0, 200, 0, 0.5); /* Moved to background */
+  /* animation: rotate 10s linear infinite; /* REMOVED animation */
+}
+
+/* New class for the rotating background and rings */
+.radarBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgb(255, 255, 255);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  animation: rotate 10s linear infinite; /* MOVED animation here */
+  z-index: 1; /* Ensure it's behind dots */
+  overflow: hidden; /* Hide sweep overflow */
+}
+
+/* Add the sweep element style */
+.radarSweep {
+  position: absolute;
+  top: 0;
+  left: 50%; /* Start from center */
+  width: 50%; /* Half the width */
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(0, 255, 0, 0),
+    rgba(255, 255, 255, 0.3)
+  ); /* Green gradient */
+  transform-origin: left center; /* Rotate around the center */
+  animation: sweep 3s linear infinite; /* Apply sweep animation */
+  z-index: 1; /* Same level as rings */
+  border-top-right-radius: 100%; /* Makes it wedge-shaped */
+  border-bottom-right-radius: 100%;
+}
+
+.ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px dotted rgba(255, 255, 255, 0.61);
+  background-color: transparent;
+  /* Ensure rings are within the background div */
+  box-sizing: border-box;
+}
+
+.ringOuter {
+  width: 90%;
+  height: 90%;
+  top: 5%;
+  left: 5%;
+}
+
+.ringMiddle {
+  width: 60%;
+  height: 60%;
+  top: 20%;
+  left: 20%;
+}
+
+.ringInner {
+  /* Added style for consistency */
+  width: 30%;
+  height: 30%;
+  top: 35%;
+  left: 35%;
+}
+
+.userDot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%); /* Center the dot */
+  width: 6px;
+  height: 6px;
+  background-color: white;
+  border: 1px solid green;
+  border-radius: 50%;
+  z-index: 3; /* Above background and target */
+}
+
+.targetDot {
+  position: absolute;
+  /* left and top are set by style prop */
+  /* transform is now set by style prop to center the dot */
+  width: 10px;
+  height: 10px;
+  background-color: rgb(0, 255, 38);
+  border-radius: 50%;
+  z-index: 2; /* Above background, below user */
+  animation: twinkle 1.5s infinite ease-in-out; /* Add twinkle animation */
+}
+
+.radarStatus {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: lightgreen;
+  font-size: 0.8em;
+  z-index: 1; /* Same level as rings */
+  /* Ensure text doesn't rotate with background - might need adjustment */
+  /* If text rotates, move it outside .radarBackground in JSX */
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Add the sweep animation */
+@keyframes sweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Add the twinkle animation */
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
+}

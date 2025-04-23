@@ -58,6 +58,10 @@ const completedQuestionSchema = new mongoose.Schema(
       ref: 'Question',
       default: null // Starts as null, set to the first question on hunt start
     },
+    currentSequenceNumber: { // The sequence number of the current question
+      type: Number,
+      default: 0, // Starts at 0, incremented as the user progresses
+    },
   
     isHuntCompleted: { // Flag to easily check if the user finished the entire hunt
         type: Boolean,

@@ -1,0 +1,43 @@
+/* Full screen overlay */
+.loadingOverlay {
+    position: fixed;
+    inset: 0; /* top, left, right, bottom = 0 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.75); /* Dark semi-transparent background */
+    z-index: 500; /* High z-index to appear on top */
+    color: white; /* Default text color */
+}
+
+/* Optional inner box for alignment if needed, but often just centering content is enough */
+.loadingBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* The CSS Spinner */
+.spinner {
+    width: 50px; /* Size of the spinner */
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.3); /* Light border */
+    border-top-color: #ffffff; /* White color for the spinning part */
+    border-radius: 50%;
+    animation: spin 1s linear infinite; /* Animation properties */
+}
+
+/* The loading message text */
+.loadingMessage {
+    margin-top: 15px; /* Space between spinner and text */
+    font-size: 1.1rem;
+    color: #eee; /* Slightly off-white */
+}
+
+/* Keyframes for the spinning animation */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

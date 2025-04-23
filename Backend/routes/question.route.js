@@ -11,11 +11,26 @@ import {
     checkAnswer,
     updateQuestion,
     deleteQuestion,
+    getCurrentSequenceQuestion,
+    checkAnswerCurrent,
+    addNextQuestion
 } from '../Controllers/Question.controller.js'; // Adjust path as needed
 import { verify,roleAuthorization } from '../middlewares/authentication.js';
 const router = express.Router();
 
 // --- Public or User Routes ---
+
+router.post(
+    '/checkCurrent',
+    verify, // User must be logged in
+    checkAnswerCurrent // Check the answer for the current question (for AR view)
+);
+
+router.get(
+    '/currentSequence',
+    verify, // User must be logged in
+    getCurrentSequenceQuestion // Get the current sequence question for the user
+);
 
 // Get the very first question (sequence 1) - Needs login to participate
 // NOTE: getFirstQuestion was originally designed for admin/setup,
@@ -29,13 +44,14 @@ router.get(
     getFirstQuestion
 );
 
+
 // --- Admin Only Routes ---
 
 // POST /api/questions - Create a new question
 router.post(
     '/',
-    verify,                 // Must be logged in
-    roleAuthorization(['admin']), // Must be an admin
+    // verify,                 // Must be logged in
+    // roleAuthorization(['admin']), // Must be an admin
     createQuestion
 );
 
@@ -97,6 +113,21 @@ router.post(
     '/check',
     verify, // User must be logged in
     checkAnswer // Check the answer for the current question
+);
+
+// POST /api/questions/checkCurrent - Check the answer for the current question (for AR view)
+
+
+// GET /api/questions/currentSequence - Get the current sequence question for the user
+
+
+
+// POST /api/questions/addNext - Add the next question in the sequence
+
+router.post(
+'/addNext/:id',
+    // verify, // User must be logged in
+    addNextQuestion // Add the next question in the sequence
 );
 
 

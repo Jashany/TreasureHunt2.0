@@ -3,6 +3,7 @@
 import asyncHandler from 'express-async-handler';
 import generateToken from '../utils/generateToken.js'; // Your token generation utility
 import UserModel from '../models/user.model.js';
+import QuestionModel from '../models/Questions.model.js';
 
 /**
  * @desc    Register a new user
@@ -26,12 +27,18 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new Error('User already exists with this email');
     }
 
+    const FirstQuestion = await QuestionModel.findOne({ sequenceNumber: 1 }); // Get the first question for the user
+
+    console.log(FirstQuestion); // Debugging line to check if the first question is fetched correctly
+
     // Create new user (password hashing handled by pre-save hook in model)
     const user = await UserModel.create({
         name,
         email,
         password, // Send plain password, hashing happens before save
         phoneNumber,
+        currentQuestion: FirstQuestion._id, // Set the first question as the current question
+        currentSequenceNumber: 1, // Start at sequence 1
         role: role && ['admin', 'user'].includes(role) ? role : 'user' // Use provided role if valid, else default
     });
 

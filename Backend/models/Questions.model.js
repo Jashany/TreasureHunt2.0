@@ -29,11 +29,23 @@ const questionSchema = new mongoose.Schema({
             index: '2dsphere' // Crucial for geospatial queries (finding nearby questions)
         }
     },
+    link: {
+        type: String,
+    },
+    points:{
+        type: Number,
+        default: 100, // Default points for the question
+    },
     sequenceNumber: { // Defines the order of questions in the hunt
         type: Number,
         required: [true, 'Sequence number is required for ordering'],
         unique: true, // Ensures each question has a unique position
         index: true,  // Good practice to index fields used for lookups/sorting
+    },
+    hint :{
+        type: String,
+        required: [true, 'Hint is required'],
+        trim: true,
     },
     nextQuestion: { // Reference to the *next* question in the sequence
         type: mongoose.Schema.Types.ObjectId,
