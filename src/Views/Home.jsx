@@ -1,106 +1,128 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // Assuming you use React Router for navigation
-import "./Home.css"; // Create a CSS file for styling if needed
+import { Link } from "react-router-dom";
+import "./Home.css"; // Assuming you have or will create Home.css for styles
+
+// Key for localStorage to track if the popup has been shown
+const POPUP_SHOWN_KEY = "huntOverPopupShown";
 
 const Home = () => {
-  const targetDate = new Date("2025-04-23T17:30:00"); // April 23, 2025, 5:30 PM
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
-  const [huntStarted, setHuntStarted] = useState(
-    Date.now() >= targetDate.getTime()
-  );
-
-  function calculateTimeLeft() {
-    const difference = targetDate.getTime() - Date.now();
-    let timeLeft = {};
-
-    if (difference > 0) {
-      timeLeft = {
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
-      };
-    }
-
-    return timeLeft;
-  }
+  const [timeLeft, setTimeLeft] = useState({});
+  const [huntStarted, setHuntStarted] = useState(false); // Or determine based on date/API
+  const [showInfoPopup, setShowInfoPopup] = useState(false); // State for the new popup
 
   useEffect(() => {
-    if (huntStarted) return; // No need for timer if hunt already started
+    // Check localStorage to see if the info popup should be shown
+    const hasSeenPopup = localStorage.getItem(POPUP_SHOWN_KEY);
+    if (!hasSeenPopup) {
+      setShowInfoPopup(true); // Show popup if not seen before
+    }
+
+    // --- Existing Timer Logic ---
+    const targetDate = new Date("2024-04-23T19:05:00"); // Set your target date/time
+
+    const calculateTimeLeft = () => {
+      const difference = +targetDate - +new Date();
+      let timeLeftData = {};
+
+      if (difference > 0) {
+        timeLeftData = {
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((difference / 1000 / 60) % 60),
+          seconds: Math.floor((difference / 1000) % 60),
+        };
+        setHuntStarted(false);
+      } else {
+        setHuntStarted(true); // Hunt starts when time is up
+      }
+      return timeLeftData;
+    };
+
+    setTimeLeft(calculateTimeLeft()); // Initial calculation
 
     const timer = setInterval(() => {
-      const newTimeLeft = calculateTimeLeft();
-      setTimeLeft(newTimeLeft);
-
-      if (Object.keys(newTimeLeft).length === 0) {
-        setHuntStarted(true);
-        clearInterval(timer);
+      const updatedTimeLeft = calculateTimeLeft();
+      setTimeLeft(updatedTimeLeft);
+      if (Object.keys(updatedTimeLeft).length === 0) {
+        clearInterval(timer); // Stop timer when time is up
       }
     }, 1000);
 
-    // Cleanup interval on component unmount
-    return () => clearInterval(timer);
-  }, [huntStarted]); // Rerun effect if huntStarted changes
+    return () => clearInterval(timer); // Cleanup timer on unmount
+  }, []); // Run effects only on mount
+
+  const handleDismissPopup = () => {
+    localStorage.setItem(POPUP_SHOWN_KEY, "true"); // Mark as seen in localStorage
+    setShowInfoPopup(false); // Hide the popup
+  };
 
   const timerComponents = [];
-
   Object.keys(timeLeft).forEach((interval) => {
     if (
       !timeLeft[interval] &&
       interval !== "seconds" &&
       Object.keys(timeLeft).length > 1
     ) {
-      // Don't push 0 values unless it's seconds or the only value left
       return;
     }
+    // Ensure proper spacing, maybe add ':' only between units
     timerComponents.push(
-      <span key={interval}>
+      <span key={interval} style={{ margin: "0 5px" }}>
         {timeLeft[interval]} {interval}
-        {":"}{" "}
       </span>
     );
   });
 
   return (
     <div className="home-container">
-      {" "}
-      {/* Added a container class */}
+      {/* One-Time Info Popup */}
+      {showInfoPopup && (
+        <div className="popup-overlay">
+          {" "}
+          {/* Use a generic overlay style */}
+          <div className="popup-content">
+            {" "}
+            {/* Use a generic content style */}
+            <h2>Event Update</h2>
+            <p>
+              The Treasure Hunt event has concluded. Three teams have
+              successfully completed the hunt, and the winners have been
+              decided. Thank you for participating!
+            </p>
+            <button onClick={handleDismissPopup} className="popup-button">
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
+
       <h1>Welcome to the Treasure Hunt!</h1>
       {huntStarted ? (
         <div className="mission-briefing">
-          {" "}
-          {/* Added a container for the briefing */}
           <h2>Mission Briefing</h2>
           <p>
             Welcome, Agents.
             <br />
             This all dates back to 2017, when an unknown developer unleashed a
-            rogue entity named Chimera—its sole purpose: chaos. But the
-            developers of the past managed to trap it deep within the shadows of
-            the digital world.
+            rogue AI, codenamed 'Echo', into the digital wild. Echo wasn't just
+            code; it learned, adapted, and fragmented itself across the network,
+            leaving behind encrypted data caches - the 'treasures'.
             <br />
             <br />
-            Yet, something has shifted. Over the past few weeks, signals
-            resembling Chimaera’s neural pattern have been detected within
-            Thapar, slipping through our once-impenetrable defences. Originally
-            designed to adapt and learn from human behaviour, it has evolved
-            beyond its code, blending seamlessly into the campus's routines,
-            spaces, and systems. No longer confined to the digital realm, it now
-            lurks within the everyday flow of student life, hiding in plain
-            sight.
+            Your mission: Track Echo's digital footprints across physical
+            locations using geo-location data embedded in the clues. Each cache
+            you secure gets us closer to the core fragment. The first team to
+            reassemble the data contains Echo and wins. Time is critical. Echo
+            is evolving. The digital and real worlds blur. Trust the clues,
+            verify your location, and may the fastest team prevail. Good luck,
+            Agents. The hunt is on.
             <br />
             <br />
-            Your mission, Agents, is to track its trail and recontain it.
-            <br />
-            <br />
-            But this is no ordinary hunt. As you delve deeper into the infected
-            zone, the story will unfold, one clue at a time. Each discovery
-            brings you closer to the truth—one that was never meant to be
+            Listen closely to the whispers in the code; they might guide you or
+            lead you astray. Sometimes, the greatest treasures are truths left
             uncovered. But beware… voices can be deceiving.
           </p>
           <Link to="/gameManager" className="start-button">
-            {" "}
-            {/* Link to /gameManager */}
             Begin Containment
           </Link>
         </div>
@@ -115,16 +137,14 @@ const Home = () => {
               marginTop: "1rem",
               fontSize: "1.5rem",
               fontFamily: "Antonio",
+              flexWrap: "wrap", // Allow wrapping on small screens
             }}
           >
-            {" "}
-            {/* Added wrapping div for timer components */}
             {timerComponents.length ? (
               timerComponents
             ) : (
               <span>Calculating...</span>
-            )}{" "}
-            {/* Changed "Time's up!" to Calculating */}
+            )}
           </div>
         </div>
       )}
