@@ -98,7 +98,7 @@ function RadarDisplay({ userLocation, targetLocation }) {
         textAlign: "center",
         fontSize: "0.8rem",
         marginTop: "0.5rem",
-        color: "#888",
+        color: "#ffffff",
       }}>
         {/* **Note:** The radar is a visual aid and does not represent real-time data. It just makes sure that a object is in the radar range but doesnt tell anything about the distance or the direction of the object. 
         write in proper english and make it more readable.
