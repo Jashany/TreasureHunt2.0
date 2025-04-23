@@ -84,7 +84,7 @@ const QuestionPopup = ({ question, isLoading, error, onSubmit, onClose }) => {
 const MagnemiteModel = ({ onClick }) => {
   const group = useRef();
   // Use the imported magnemite model variable
-  const { scene, animations } = useGLTF('/src/assets/magnemite/scene.gltf');
+  const { scene, animations } = useGLTF('/assets/magnemite/scene.gltf');
   const { actions } = useAnimations(animations, group); // Use useAnimations hook
 
 
