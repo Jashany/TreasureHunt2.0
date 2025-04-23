@@ -31,7 +31,7 @@ const Login = () => {
     try {
       // Ensure the backend URL is correct
       const response = await fetch(
-        "https://treasure-api.jsondev.in//api/users/login",
+        "https://treasure-api.jsondev.in/api/users/login",
         {
           method: "POST",
           headers: {

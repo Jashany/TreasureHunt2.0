@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Admin.css"; // Create or use an existing CSS file for styling
 
 // Define the base URL for the API
-const API_BASE_URL = "https://treasure-api.jsondev.in//api/questions"; // Adjust if your backend runs elsewhere
+const API_BASE_URL = "https://treasure-api.jsondev.in/api/questions"; // Adjust if your backend runs elsewhere
 
 const Admin = () => {
   // --- Component State ---

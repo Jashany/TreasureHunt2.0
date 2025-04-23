@@ -25,7 +25,7 @@ const GameManager2 = () => {
     setDistance(null); // Reset distance
     try {
       const response = await fetch(
-        "https://treasure-api.jsondev.in//api/questions/currentSequence",
+        "https://treasure-api.jsondev.in/api/questions/currentSequence",
         {
           method: "GET",
           credentials: "include",

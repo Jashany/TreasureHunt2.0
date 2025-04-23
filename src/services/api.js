@@ -97,7 +97,7 @@ export const fetchClue = async (clueId = null) => {
     */
 };
 
-const QUESTIONS_URL = `https://treasure-api.jsondev.in//api/questions`;
+const QUESTIONS_URL = `https://treasure-api.jsondev.in/api/questions`;
 
 export const apiSlice = createApi({
   // ...existing baseQuery and tagTypes...

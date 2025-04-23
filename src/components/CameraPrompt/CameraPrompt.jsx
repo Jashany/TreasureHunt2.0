@@ -173,7 +173,7 @@ const CameraPrompt = ({ showAr, onCorrectAnswer }) => {
     setQuestionData(null);
     try {
       const response = await fetch(
-        "https://treasure-api.jsondev.in//api/questions/currentSequence",
+        "https://treasure-api.jsondev.in/api/questions/currentSequence",
         {
           method: "GET",
           credentials: "include",
@@ -216,7 +216,7 @@ const CameraPrompt = ({ showAr, onCorrectAnswer }) => {
     setIsLoadingAnswer(true); // Use separate loading state
     try {
       const response = await fetch(
-        `https://treasure-api.jsondev.in//api/questions/checkCurrent`,
+        `https://treasure-api.jsondev.in/api/questions/checkCurrent`,
         {
           method: "POST",
           credentials: "include",

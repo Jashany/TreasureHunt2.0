@@ -30,7 +30,7 @@ const Signup = () => {
       // Make sure your backend is running and accessible
       // The URL might need adjustment based on your setup (e.g., proxy in vite.config.js)
       const response = await fetch(
-        "https://treasure-api.jsondev.in//api/users/register",
+        "https://treasure-api.jsondev.in/api/users/register",
         {
           // Use the correct backend URL
           method: "POST",
