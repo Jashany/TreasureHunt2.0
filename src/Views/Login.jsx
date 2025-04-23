@@ -30,15 +30,18 @@ const Login = () => {
 
     try {
       // Ensure the backend URL is correct
-      const response = await fetch("http://localhost:5000/api/users/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        // Include credentials to send/receive cookies
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await fetch(
+        "https://treasure-api.jsondev.in//api/users/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          // Include credentials to send/receive cookies
+          credentials: "include",
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
       const data = await response.json();
 

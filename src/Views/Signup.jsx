@@ -29,14 +29,17 @@ const Signup = () => {
     try {
       // Make sure your backend is running and accessible
       // The URL might need adjustment based on your setup (e.g., proxy in vite.config.js)
-      const response = await fetch("http://localhost:5000/api/users/register", {
-        // Use the correct backend URL
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email, password, phoneNumber }),
-      });
+      const response = await fetch(
+        "https://treasure-api.jsondev.in//api/users/register",
+        {
+          // Use the correct backend URL
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, email, password, phoneNumber }),
+        }
+      );
 
       const data = await response.json();
 

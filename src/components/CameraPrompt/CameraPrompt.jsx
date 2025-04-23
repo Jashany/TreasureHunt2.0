@@ -173,7 +173,7 @@ const CameraPrompt = ({ showAr, onCorrectAnswer }) => {
     setQuestionData(null);
     try {
       const response = await fetch(
-        "http://localhost:5000/api/questions/currentSequence",
+        "https://treasure-api.jsondev.in//api/questions/currentSequence",
         {
           method: "GET",
           credentials: "include",
@@ -216,7 +216,7 @@ const CameraPrompt = ({ showAr, onCorrectAnswer }) => {
     setIsLoadingAnswer(true); // Use separate loading state
     try {
       const response = await fetch(
-        `http://localhost:5000/api/questions/checkCurrent`,
+        `https://treasure-api.jsondev.in//api/questions/checkCurrent`,
         {
           method: "POST",
           credentials: "include",
@@ -249,7 +249,10 @@ const CameraPrompt = ({ showAr, onCorrectAnswer }) => {
         toast.error(result.message || "Incorrect Answer. Try again!");
       }
     } catch (error) {
-      if (error.success === false || error.message === "Incorrect answer. Please try again.") {
+      if (
+        error.success === false ||
+        error.message === "Incorrect answer. Please try again."
+      ) {
         toast.error("Incorrect Answer. Try again!");
       } else {
         console.error("Failed to submit answer:", error);

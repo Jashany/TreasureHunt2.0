@@ -25,7 +25,7 @@ const GameManager2 = () => {
     setDistance(null); // Reset distance
     try {
       const response = await fetch(
-        "http://localhost:5000/api/questions/currentSequence",
+        "https://treasure-api.jsondev.in//api/questions/currentSequence",
         {
           method: "GET",
           credentials: "include",
@@ -216,14 +216,12 @@ const GameManager2 = () => {
         )}
 
       {gameState === "GAME_OVER" && (
-        <div style={{ textAlign: "left",padding: "2rem",
-            fontSize: "1.5rem",
-         }}>
+        <div style={{ textAlign: "left", padding: "2rem", fontSize: "1.5rem" }}>
           <p>
             Last known signal pinged here, then vanished. This wasn’t
             containment. This was an exit. Everything we traced led to this
             node. But it’s not a hub. It’s a hatch. Every clue. Every lead.
-            Every agent. We weren’t tracking it. 
+            Every agent. We weren’t tracking it.
             <br />
             It was guiding us. . . . .
             <br />
